@@ -1,27 +1,31 @@
+# .github/workflows/docker-build.yml
 name: Build & Push Docker
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout hela repot
         uses: actions/checkout@v3
 
-      - name: Login to registry
+      - name: Logga in i registry
         uses: docker/login-action@v2
         with:
           registry: ${{ secrets.REGISTRY_URL }}
           username: ${{ secrets.REGISTRY_USER }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      - name: Build and push
+      - name: Bygg och pusha Docker-image
         uses: docker/build-push-action@v3
         with:
-          context: .                          # här är hela repo-roten
-          file: backend/Dockerfile           # Dockerfilen i backend/
+          context: .                  # här pekar vi på repo-roten
+          file: backend/Dockerfile    # Dockerfile i backend/
           push: true
-          tags: ${{ secrets.REGISTRY_URL }}/my-app:${{ github.sha }}
+          tags: |
+            ${{ secrets.REGISTRY_URL }}/my-app:latest
+            ${{ secrets.REGISTRY_URL }}/my-app:${{ github.sha }}
